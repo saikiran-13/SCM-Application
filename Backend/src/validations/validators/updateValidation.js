@@ -6,7 +6,6 @@ function updateValidation (req,res,next){
     }
     else{
         console.log(value)
-        // res.send("Product Validation Successfull")
         next()
     }
 }

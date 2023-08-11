@@ -1,14 +1,15 @@
 import React from 'react';
 import '../App.css';
 import SCMheader from '../components/SCMheader';
-import Footer from '../components/SCMfooter';
+
 import sideImage from '../assets/Images/sideImage.png';
 
 const Supplychainmanagement = () => {
   return (
     <>
       <div className="bg-darkblue h-screen ">
-        <SCMheader value={'homepage'} />
+        <SCMheader />
+
         <div className="flex justify-between p-10">
           <div className="flex flex-col w-fit font-main tracking-widest">
             <div className="headline text-7xl font-bold py-5 text-left text-white ">
@@ -34,7 +35,7 @@ const Supplychainmanagement = () => {
             </div>
           </div>
 
-          <div className="sideimage flex justify-end items-center">
+          <div className="sideimage flex justify-end items-center animate-pulse">
             <img
               src={sideImage}
               width={800}

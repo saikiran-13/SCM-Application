@@ -7,22 +7,48 @@ const products = sequelize.models.products;
 const producthistory = sequelize.models.producthistory;
 
 // Function to handle the "verify" operation
-async function handleVerify(pid, status) {
-  const exists = await products.findOne({ where: { pid } });
+
+async function handleVerify(id, status) {
+  const transfer = await producthistory.findOne({ attributes: ['history'], where: { id } });
+  const exists = await products.findOne({ where: { id } });
   if (exists) {
-    await products.update({ status }, { where: { pid } });
+    await products.update({ status,location:'WareHouse',transited:false }, { where: { id } });
+
+    await producthistory.update({
+      history: [
+        ...transfer.dataValues.history,
+        {
+          time: time(),
+          location: "WareHouse",
+          status
+        }
+      ]
+    }, { where: { id } });
     return { status };
   } else {
-    throw new Error(`Product with this Id:${pid} doesn't exist`);
+    throw new Error(`Product with this Id:${id} doesn't exist`);
   }
 }
 
 // Function to handle the "transfer" operation
-async function handleTransfer(pid, status) {
-    
-  const transfer = await producthistory.findOne({ attributes: ['history'], where: { pid } });
+async function handleTransfer(id, status) {
+  const transfer = await producthistory.findOne({ attributes: ['history'], where: { id } });
+  // const verifiedProduct = await products.update({transited:true},{
+  //   where:{
+  //     id
+  //   }
+  // })
+
+
+  const location = (status === 'Defective')?"Factory":"Store"
+  console.log("locationnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",location)
+  await products.update({location,transited:false},{
+    where:{
+      id
+    }
+  })
   if (transfer) {
-    const location = (status === 'Defective')?"Factory":"Store"
+
     await producthistory.update({
       history: [
         ...transfer.dataValues.history,
@@ -30,10 +56,10 @@ async function handleTransfer(pid, status) {
           time: time(),
           from: "WareHouse",
           to: location,
-          status
+          status:'Transited'
         }
       ]
-    }, { where: { pid } });
+    }, { where: { id } });
     return "Product History Updated";
   } else {
     throw new Error("Product Not available in the WareHouse");
@@ -41,12 +67,13 @@ async function handleTransfer(pid, status) {
 }
 
 const verifyProduct = async (req, res) => {
+  console.log("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV")
   const { username, organization } = req.user;
-  const { pid, status, operation } = req.body;
+  const { id, status, operation } = req.body;
   const secretKey = decodeSecretKey(username)
 
   try {
-    const response = await verifyAndTransferProduct(pid, operation, status, username,secretKey,organizations[organization]);
+    const response = await verifyAndTransferProduct(id, operation, status, username,secretKey,organizations[organization]);
 
     if (!response) {
       res.status(404).json({ message: `Your request to ${operation} was unsuccessful` });
@@ -55,20 +82,21 @@ const verifyProduct = async (req, res) => {
 
     switch (operation) {
       case 'verify':
-        const verifyResult = await handleVerify(pid, status);
+        const verifyResult = await handleVerify(id, status);
         res.status(200).json(verifyResult);
         break;
 
       case 'transfer':
-        const transferResult = await handleTransfer(pid, status);
+        const transferResult = await handleTransfer(id, status);
         res.status(200).json(transferResult);
         break;
 
       default:
-        res.send("Invalid Operation");
+        res.staus(404).send("Invalid Operation");
     }
+
   } catch (error) {
-    res.json({ error: error.message });
+    res.status(404).json({ error: error.message });
   }
 };
 

@@ -9,11 +9,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      pid: {
-        type: Sequelize.INTEGER
-      },
       name: {
         type: Sequelize.STRING
+      },
+      image:{
+        type:Sequelize.STRING
       },
       battery: {
         type: Sequelize.STRING
@@ -34,6 +34,10 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue:"Not Sold"
       },
+      transited:{
+        type:Sequelize.BOOLEAN,
+        defaultValue:false
+      }
     });
   },
   async down(queryInterface, Sequelize) {

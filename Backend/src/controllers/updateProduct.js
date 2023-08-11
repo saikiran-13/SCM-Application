@@ -5,12 +5,23 @@ const decodeSecretKey = require('../../utils/decodeSecretKey')
 const organizations = require('../../utils/constants/organizations')
 const products = sequelize.models.products
 const producthistory = sequelize.models.producthistory
+// const transfer = await producthistory.findOne({ attributes: ['history'], where: { id } });
 
-
-async function handleUpdate(pid) {
-    const exists = await products.findOne({ where: { pid } });
+async function handleUpdate(id,name,image,battery,camera,price) {
+    const transfer = await producthistory.findOne({ attributes: ['history'], where: { id } });
+    const exists = await products.findOne({ where: { id } });
     if (exists) {
-        await products.update({ status: "Updated" }, { where: { pid } });
+        await products.update({name,image,battery,camera,price, status: "Updated" }, { where: { id } });
+        await producthistory.update({
+            history: [
+                ...transfer.dataValues.history,
+                {
+                    time: time(),
+                    location: "Factory",
+                    status: "Updated"
+                }
+            ]
+        }, { where: { id } });
         return "Product Updated Successfully";
     } else {
         throw new Error("Product doesn't exist");
@@ -18,8 +29,10 @@ async function handleUpdate(pid) {
 }
 
 // Function to handle the "transfer" operation
-async function handleTransfer(pid) {
-    const transfer = await producthistory.findOne({ where: { pid } });
+async function handleTransfer(id) {
+    const transfer = await producthistory.findOne({ attributes: ['history'], where: { id } });
+    // const transfer = await producthistory.findOne({ where: { id } });
+    await products.update({transited:true}, { where: { id,status: "Updated" } });
     if (transfer) {
         await producthistory.update({
             history: [
@@ -28,10 +41,10 @@ async function handleTransfer(pid) {
                     time: time(),
                     from: "Factory",
                     to: "WareHouse",
-                    status: "Updated"
+                    status: "Transited"
                 }
             ]
-        }, { where: { pid } });
+        }, { where: { id } });
         return "Product History Updated";
     } else {
         throw new Error("Product Not available in the Factory");
@@ -43,23 +56,23 @@ async function handleTransfer(pid) {
 
 const updateProduct = async (req, res) => {
     const { username, organization } = req.user;
-    const { pid, operation } = req.body
+    let { id, name,image, battery, camera, price, operation } = req.body;
     const secretKey = decodeSecretKey(username)
-    const response = await updateAndTransferProduct(pid, operation, username,secretKey,organizations[organization])
+    const response = await updateAndTransferProduct(id, operation, username,secretKey,organizations[organization])
 
     switch (operation) {
         case "update":
-            let updateResult = await handleUpdate(pid)
-            res.send(updateResult);
+            let updateResult = await handleUpdate(id,name,image,battery,camera,price)
+            res.status(200).send(updateResult);
             break;
 
         case 'transfer':
-            transferResult = await handleTransfer(pid);
-            res.send(transferResult);
+            transferResult = await handleTransfer(id);
+            res.status(200).send(transferResult);
             break;
 
         default:
-            res.send("Invalid Operation");
+            res.status(404).send("Invalid Operation");
     }
 
 

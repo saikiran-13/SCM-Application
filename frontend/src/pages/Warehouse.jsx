@@ -2,14 +2,16 @@ import React from 'react';
 import '../App.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import WarehousePath from '../assets/Images/Warehouse.png';
 import QualityProducts from '../components/QualityProducts';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Warehouse = () => {
   return (
     <div>
+      <ToastContainer />
       <Header
         logoPath={WarehousePath}
         logo={'Warehouse'}
@@ -35,7 +37,7 @@ const Warehouse = () => {
         </div>
       </div>
       <QualityProducts />
-      <></>
+
       <Footer />
     </div>
   );

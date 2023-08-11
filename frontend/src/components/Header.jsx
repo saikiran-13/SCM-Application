@@ -20,7 +20,6 @@ const Header = ({ logoPath, logo, text }) => {
             &nbsp;{text}
           </button>
         </div>
-        {/* )} */}
       </div>
     </>
   );

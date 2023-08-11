@@ -26,6 +26,7 @@ module.exports = {
       'lightblue':"#F4F6FC",
       'lightgreen':'#02703B',
       'creamblue':'#6A7D93',
+      'darkcreamblue':'#576771',
       'gray':'#F5F5F5'
     },
     fontFamily:{

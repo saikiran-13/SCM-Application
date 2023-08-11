@@ -9,9 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      pid: {
-        type: Sequelize.INTEGER
-      },
+ 
       history: {
         type: Sequelize.JSON
       },

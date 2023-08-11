@@ -9,7 +9,8 @@ const registerUser = async (req,res)=>{
     const {username,password} = req.body;
     const exists = await userDetails.findOne({where:{username}})
     if(exists){
-        res.send("Username already exists")
+        console.log("hello")
+        res.status(200).json({'Message':"Username already exists"})
         return 
     }
     
@@ -24,7 +25,8 @@ const registerUser = async (req,res)=>{
         role:'user',
         organization:'Store'
     })
-    res.send(secret)
+    console.log(credentials)
+    res.status(200).json({"Message":"User Registration Successful"})
  
 }
 module.exports = registerUser

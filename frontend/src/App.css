@@ -15,3 +15,30 @@
 }
 
 
+/* Custom blaster button style */
+/* Custom styling for the container and button */
+.confetti-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.confetti-button {
+  padding: 12px 24px;
+  font-size: 18px;
+  background-color: #3490dc;
+  color: white;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Style for the Confetti component (no need to modify) */
+.react-confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+

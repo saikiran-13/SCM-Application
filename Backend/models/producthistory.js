@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   producthistory.init({
-    pid: DataTypes.INTEGER,
     history: DataTypes.JSON
   }, {
     sequelize,

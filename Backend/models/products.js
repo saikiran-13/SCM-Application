@@ -15,16 +15,21 @@ module.exports = (sequelize, DataTypes) => {
   }
   products.init(
     {
-    pid: DataTypes.INTEGER,
     name: DataTypes.STRING,
+    image:DataTypes.STRING,
     battery: DataTypes.STRING,
     camera: DataTypes.STRING,
     price: DataTypes.INTEGER,
     location: DataTypes.STRING,
     status: DataTypes.STRING,
+  
     owner:{
       type:DataTypes.STRING,
       defaultValue:"Not Sold"
+    },
+    transited:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
     }
   }, {
     sequelize,

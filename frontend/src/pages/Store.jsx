@@ -2,36 +2,45 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Storepath from '../assets/Images/Store.png';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import SearchIcon from '@material-ui/icons/Search';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { useContext } from 'react';
 import Verify from '../assets/Images/verify.png';
+import jwtDecode from 'jwt-decode';
 import VerifiedProducts from '../components/VerifiedProducts';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import Confetti from 'react-confetti';
+import 'react-toastify/dist/ReactToastify.css';
 import { Appcontext } from '../App';
 
 const Store = () => {
-  const { admin, isAdmin } = useContext(Appcontext);
+  const { showConfetti, setShowConfetti } = useContext(Appcontext);
+  const token = localStorage.getItem('Storetoken');
+  const decodedToken = jwtDecode(token);
+  const [admin, isAdmin] = useState(
+    decodedToken?.role == 'admin' ? true : false,
+  );
+  const [searchText, setSearchText] = useState('');
   const [query, setQuery] = useState('');
 
   const handleInputChange = (event) => {
     setQuery(event.target.value);
+    setSearchText(event.target.value);
   };
 
-  const handleSearch = () => {
-    // Call the onSearch prop with the current query value
-    // onSearch(query);
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      handleSearch();
-    }
+  const handleStartConfetti = () => {
+    console.log('Confetti');
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000); // Duration of confetti effect in milliseconds
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
+      <ToastContainer />
+      {showConfetti && (
+        <Confetti width={window.innerWidth} height={window.innerHeight} />
+      )}
       <Header logoPath={Storepath} logo="Store" text="Home" />
       <div className="flex flex-col justify-center font-main ">
         <h1 className="text-8xl font-bold tracking-wider text-primary">
@@ -58,18 +67,18 @@ const Store = () => {
             placeholder="Search Your Products"
             value={query}
             onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            // startAdornment={
-            //   <InputAdornment position="start">
-            //     <SearchIcon />
-            //   </InputAdornment>
-            // }
+            // onKeyPress={handleKeyPress}
           />
           {/* <SearchIcon style={{ marginRight: '10px' }} /> */}
         </div>
       )}
 
-      <VerifiedProducts admin={admin} />
+      <VerifiedProducts
+        admin={admin}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        handleStartConfetti={handleStartConfetti}
+      />
       <Footer />
     </div>
   );

@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const Details = () => {
+const Details = ({ Product }) => {
   return (
     <div className="mx-auto max-w-md bg-lightblue">
       <Accordion className="shadow-lg rounded-lg bg-lightblue">
@@ -23,25 +23,25 @@ const Details = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Typography className="text-gray-600 font-medium">Id:</Typography>
-              <Typography>1</Typography>
+              <Typography>{Product.id}</Typography>
             </div>
             <div>
               <Typography className="text-gray-600 font-medium">
                 Battery:
               </Typography>
-              <Typography>5000mAh</Typography>
+              <Typography>{Product.battery}</Typography>
             </div>
             <div>
               <Typography className="text-gray-600 font-medium">
                 Camera:
               </Typography>
-              <Typography>64MP</Typography>
+              <Typography>{Product.camera}</Typography>
             </div>
             <div>
               <Typography className="text-gray-600 font-medium">
                 Price:
               </Typography>
-              <Typography>12000</Typography>
+              <Typography>{Product.price}</Typography>
             </div>
           </div>
         </AccordionDetails>

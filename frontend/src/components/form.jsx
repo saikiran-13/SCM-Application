@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField, Button, Grid, Typography, Container } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import { useContext } from 'react';
 import { Appcontext } from '../App';
+import { toastify } from '../utils/toastify';
+import Loader from '../utils/loader';
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -21,39 +24,78 @@ const theme = createTheme({
   },
 });
 
-const ProductForm = ({ product, onSubmit }) => {
-  const { setProductDetails } = useContext(Appcontext);
+const ProductForm = () => {
+  const { productDetails, loading, setLoading, setProductDetails } =
+    useContext(Appcontext);
+
+  useEffect(() => {
+    function products() {
+      setProductDetails(null);
+    }
+    products();
+  }, [productDetails]);
+  const product = productDetails;
+
+  const [btnText, setBtnText] = useState(
+    product?.id ? 'Update Product' : 'Create Product',
+  );
+
+  // const { setProductDetails } = useContext(Appcontext);
+
   const [formData, setFormData] = useState({
-    id: product.id || '',
-    name: product.name || '',
-    image: product.image || '',
-    battery: product.battery || '',
-    camera: product.camera || '',
-    price: product.price || '',
+    id: product?.id || '',
+    name: product?.name || '',
+    image: product?.image || '',
+    battery: product?.battery || '',
+    camera: product?.camera || '',
+    price: product?.price || '',
+    operation: product?.id ? 'update' : 'create',
   });
+
+  useEffect(() => {
+    setBtnText(product?.id ? 'Update Product' : 'Create Product');
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setProductDetails({
-      id: '',
-      name: '',
-      image: '',
-      battery: '',
-      camera: '',
-      price: '',
+    setLoading(true);
+    const token = localStorage.getItem('Factorytoken');
+
+    const link =
+      formData?.id && formData?.operation === 'update'
+        ? 'updateAndTransferProduct'
+        : 'createAndTransferProduct';
+    console.log(formData, link);
+    const response = await fetch(`http://localhost:5000/${link}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
     });
-    onSubmit(formData);
+
+    setTimeout(() => {
+      const toastMessage = formData?.id
+        ? 'Product Updated Successfully'
+        : 'Product Created Successfully';
+      setLoading(false);
+      if (response) {
+        toastify('success', toastMessage);
+      } else {
+        toastify('success', 'Product Creation failed');
+      }
+    }, 3000);
   };
 
   return (
     <ThemeProvider theme={theme}>
       <Container
-        // maxWidth="md"
         maxWidth="md"
         className="glassmorphism-form p-5 font-roboto mb-28"
       >
@@ -125,10 +167,11 @@ const ProductForm = ({ product, onSubmit }) => {
               <Button
                 type="submit"
                 variant="contained"
-                className="bg-black text-white  "
+                className={`bg-black text-white  `}
                 fullWidth
               >
-                {product.id ? 'Update Product' : 'Add Product'}
+                {loading && <Loader />}
+                {btnText}
               </Button>
             </Grid>
           </Grid>
